@@ -1,0 +1,21 @@
+{
+  "name": "recorder",
+  "version": "1.0.0",
+  "description": "speed test",
+  "main": "index.js",
+  "author": "ayecue",
+  "license": "MIT",
+  "dependencies": {
+    "datetime-js": "^4.0.0",
+    "live-server": "^1.2.1",
+    "local-cors-proxy": "^1.1.0",
+    "speedtest-net": "^1.2.5"
+  },
+  "scripts": {
+    "start": "node ./bin/start",
+    "start_interval": "node ./bin/start_interval",
+    "show": "node ./bin/show",
+    "serve": "node ./bin/server",
+    "generate": "node ./bin/generate"
+  }
+}

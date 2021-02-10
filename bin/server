@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+const server = require('live-server');
+const lcp = require('local-cors-proxy')
+ 
+server.start({
+  root: './public',
+  open: true,
+  file: 'index.html'
+});
+
+lcp.startProxy(8010, 'https://cdnjs.cloudflare.com', '/proxy', false, '*');

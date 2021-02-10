@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+const [interval] = process.argv.slice(2);
+
+require('../src/index').runInterval(interval * 1000);
