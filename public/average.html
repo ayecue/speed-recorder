@@ -153,13 +153,11 @@
 
 	  const data = Object.entries(stackedByDate)
 	  	.map(([key, value]) => {
-	  		const success = value
-	  			.filter(({ success }) => success !== false);
-	  		const downloads = success
+	  		const downloads = value
 		  		.map(({ speeds }) => speeds.download);
-		  	const uploads = success
+		  	const uploads = value
 		  		.map(({ speeds }) => speeds.upload);
-		  	const pings = success
+		  	const pings = value
 		  		.map(({ server }) => server.ping);
 		  	const download = getStats(...downloads).avg;
 		  	const upload = getStats(...uploads).avg;
