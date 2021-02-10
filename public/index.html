@@ -157,18 +157,18 @@
 	  const data = records;
 
 	  if (typeof data !== 'undefined') {
-	  	const success = data
-	  		.filter(({ success }) => success !== false);
-	  	const downloads = success
+	  	const downloads = data
 	  		.map(({ speeds }) => speeds.download);
-	  	const uploads = success
+	  	const uploads = data
 	  		.map(({ speeds }) => speeds.upload);
-	  	const pings = success
+	  	const pings = data
 	  		.map(({ server }) => server.ping);
 	  	const download = getStats(...downloads);
 	  	const upload = getStats(...uploads);
 	  	const ping = getStats(...pings);
-			var failures = data
+	  	const success = data
+	  		.filter(({ success }) => success !== false);
+			const failures = data
 	    	.filter(({ success }) => success === false);
 
 	    document.getElementById('hasData').classList.remove('hidden');
@@ -193,7 +193,7 @@
 	    	<tr><td><span class="blue">Min</span>/<span class="green">Max</span>/<span class="red">Avg</span> Download</td><td><span class="blue">${download.min}</span>/<span class="green">${download.max}</span>/<span class="red">${download.avg}</span></td></tr>
 	    	<tr><td><span class="blue">Min</span>/<span class="green">Max</span>/<span class="red">Avg</span> Upload</td><td><span class="blue">${upload.min}</span>/<span class="green">${upload.max}</span>/<span class="red">${upload.avg}</span></td></tr>
 	    	<tr><td><span class="blue">Min</span>/<span class="green">Max</span>/<span class="red">Avg</span> Ping</td><td><span class="blue">${ping.min}</span>/<span class="green">${ping.max}</span>/<span class="red">${ping.avg}</span></td></tr>
-	    	<tr><td>Success</td><td>${success.length}</td></tr>
+	    	<tr><td>Successful</td><td>${success.length}</td></tr>
 	      <tr><td>Failures</td><td>${failures.length}</td></tr>
 	    </tbody>`;
 
