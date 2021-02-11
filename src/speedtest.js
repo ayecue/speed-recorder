@@ -12,7 +12,7 @@ function write (data) {
   };
 
   data.date = DateTime(current, '%d/%m/%Y %H:%i:%s');
-  data.timestamp = current.getTime() / 1000;
+  data.timestamp = current.getTime();
   data.success = true;
 
   if (!fs.existsSync(TARGET)) fs.mkdirSync(TARGET, onError);
