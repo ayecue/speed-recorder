@@ -2,98 +2,7 @@
 <html>
 <head>
   <title>Speed Test Graph</title>
-
-  <style>
-    body{
-      margin-bottom: 50px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    table{
-      width: 100%;
-    }
-
-    span {
-      display: block;
-      font-size: .7em;
-      color: grey;
-    }
-
-    .info-box {
-    	float: left;
-    	display: block;
-    	border: 1px solid #000;
-    	height: 200px;
-    	margin-bottom: 10px;
-    	margin-right: 15px;
-    	width: 30%;
-    	padding: 5px;
-    }
-
-    .request-box {
-    	clear: both;
-    	border: 1px solid #000;
-    	padding: 5px;
-    }
-
-    .download {
-      color: darkgreen;
-      font-weight: bold;
-    }
-
-    .upload {
-      color: blue;
-      font-weight: bold;
-    }
-
-    .axis path {
-      fill: none;
-      stroke: #777;
-      shape-rendering: crispEdges;
-    }
-
-    .axis text {
-      font-family: Lato;
-      font-size: 13px;
-    }
-
-    #nodata {
-      font-size: 30px;
-      text-align: center;
-    }
-
-    #nodata p {
-      font-size: 18px;
-      text-align: center;
-    }
-
-    .log-wrapper {
-      height: 200px;
-      overflow-y: scroll;
-      max-height: 200px;
-    }
-
-    .hidden {
-    	display: none;
-    }
-
-    span {
-    	display: inline;
-    	font-size: 16px;
-    }
-
-    .red {
-    	color: red;
-    }
-
-    .blue {
-    	color: blue;
-    }
-
-    .green {
-    	color: green;
-    }
-  </style>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
 	<div style="margin:10px">
@@ -106,6 +15,8 @@
   </div>
 
   <div id="hasData" class="hidden">
+    <div id="dates"></div>
+
     <div class="info-box last">
       <h3>Last Speed Test</h3>
       <table id="lastTest"></table>
@@ -147,29 +58,23 @@
 </div>
 
 	<script src="http://localhost:8010/proxy/ajax/libs/Chart.js/2.9.4/Chart.min.js" charset="utf-8"></script>
+	<script src="components/chart.js"></script>
+  <script src="components/logs.js"></script>
+  <script src="components/dates.js"></script>
 	<script src="utils.js"></script>
 	<script src="refs.js"></script>
 	<script>
-	  setTimeout(function () {
-	    window.location.reload(1);
-	  }, 10000);
+    dates(document.getElementById('dates'), records);
 
-	  const data = records;
+    const url = new URL(location.href);
+    const dateFilter = url.searchParams.get('date');
+	  const data = filter(records, [dateFilter && 'DATE'], { date: dateFilter });
 
-	  if (typeof data !== 'undefined') {
-	  	const downloads = data
-	  		.map(({ speeds }) => speeds.download);
-	  	const uploads = data
-	  		.map(({ speeds }) => speeds.upload);
-	  	const pings = data
-	  		.map(({ server }) => server.ping);
-	  	const download = getStats(...downloads);
-	  	const upload = getStats(...uploads);
-	  	const ping = getStats(...pings);
-	  	const success = data
-	  		.filter(({ success }) => success !== false);
-			const failures = data
-	    	.filter(({ success }) => success === false);
+    console.log(data)
+
+	  if (typeof data !== 'undefined' && data.length > 0) {
+	  	const {  download, upload, ping } = getImportantStats(data);
+	  	const { success, failures } = getSuccessAndFailures(data);
 
 	    document.getElementById('hasData').classList.remove('hidden');
 	    document.getElementById('noData').classList.add('hidden');
@@ -203,72 +108,8 @@
 	      <tr><td>Country</td><td>${lastData.server.country}</td></tr>
 	    </tbody>`;
 
-	    for(var i = data.length - 1; i >= 0; i--) {
-	    	const entry = document.createElement("tr");
-
-	    	entry.innerHTML = `
-	    		<td>${data[i].date}</td>
-	        <td>${data[i].speeds.download}</td>
-	        <td>${data[i].speeds.upload}</td>
-	        <td>${data[i].server.ping}</td>
-	    	`;
-
-	      logBody.append(entry);
-	    }
-
-			var chartConfig = {
-				type: 'line',
-				data: {
-					labels: data.map(({ date }) => date),
-					datasets: [{
-						label: 'Download',
-						backgroundColor: 'rgb(75, 192, 192)',
-						borderColor: 'rgb(75, 192, 192)',
-						data: data.map(({ speeds }) => speeds.download),
-						fill: false,
-						pointRadius: 2,
-						borderWidth: 1
-					}, {
-						label: 'Upload',
-						fill: false,
-						backgroundColor: 'rgb(54, 162, 235)',
-						borderColor: 'rgb(54, 162, 235)',
-						data: data.map(({ speeds }) => speeds.upload),
-						pointRadius: 2,
-						borderWidth: 1
-					}]
-				},
-				options: {
-					maintainAspectRatio: false,
-					responsive: true,
-					animation: {
-	        	duration: 0
-	        },
-	        hover: {
-            animationDuration: 0
-	        },
-	        responsiveAnimationDuration: 0,
-					scales: {
-						xAxes: [{
-							display: true,
-							scaleLabel: {
-								display: true,
-								labelString: 'Time'
-							}
-						}],
-						yAxes: [{
-							display: true,
-							scaleLabel: {
-								display: true,
-								labelString: 'Speed'
-							}
-						}]
-					}
-				}
-			};
-
-			const ctx = document.getElementById('canvas').getContext('2d');
-			new Chart(ctx, chartConfig);
+	    logs(document.getElementById('log'), data);
+			chart(document.getElementById('canvas'), data);
 	  } else {
 	    document.getElementById('hasData').classList.add('hidden');
 	    document.getElementById('noData').classList.remove('hidden');
